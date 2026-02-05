@@ -13,8 +13,7 @@
   --color-text-muted: rgba(255, 255, 255, 0.6);
 
   /* Tipografía */
-  --font-family-primary: "Geist", Arial, Helvetica, sans-serif;
-  --font-family-mono: "Geist Mono", monospace;
+  --font-family-primary: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 
   --font-size-sm: 12px;
   --font-size-base: 14px;
@@ -27,14 +26,15 @@
   --letter-spacing-tight: -4px;
 
   /* Rueda - Posicionamiento */
-  --wheel-right-offset: 80px;
+  --wheel-right-offset: 190px;
   --wheel-container-width: 300px;
   --wheel-item-offset: 20px;
 
   /* Rueda - Elementos */
-  --wheel-tick-width: 24px;
+  --wheel-tick-width: 32px;
   --wheel-tick-height: 2px;
   --wheel-item-gap: 12px;
+  --wheel-project-font-size: 16px;
 
   /* Transiciones */
   --transition-fast: 150ms ease;
@@ -49,8 +49,7 @@
 @theme inline {
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
 }
 
 /* ==========================================================================
@@ -114,7 +113,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-text-primary);
-  font-size: var(--font-size-base);
+  font-size: var(--wheel-project-font-size);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
