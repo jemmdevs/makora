@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
 }
 
 @theme inline {
@@ -12,15 +12,70 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+/* Page Container */
+.page-container {
+  min-height: 100vh;
+  width: 100%;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Month Wheel Styles */
+.month-wheel-container {
+  position: fixed;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 100vh;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  overflow: visible;
+}
+
+.month-wheel-container:active {
+  cursor: grabbing;
+}
+
+.month-item {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.month-tick {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  letter-spacing: -4px;
+}
+
+.month-name {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.tick {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: #ffffff;
 }
