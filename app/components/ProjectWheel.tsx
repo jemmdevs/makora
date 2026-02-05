@@ -5,7 +5,6 @@ import { useWheelRotation } from "@/app/hooks/useWheelRotation";
 import {
   PROJECTS,
   WHEEL_CONFIG,
-  POSITION_CONFIG,
 } from "@/app/config/wheel.config";
 
 interface WheelItemPosition {
@@ -53,7 +52,7 @@ function calculateItemPosition(
 }
 
 export default function ProjectWheel() {
-  const { rotation } = useWheelRotation();
+  const { rotation, selectedIndex } = useWheelRotation();
 
   const items = useMemo(() => {
     const renderedItems: ReactNode[] = [];
@@ -68,6 +67,7 @@ export default function ProjectWheel() {
       if (isProject) {
         const projectIndex =
           (i / WHEEL_CONFIG.slotsPerProject) % PROJECTS.length;
+        const isSelected = projectIndex === selectedIndex;
 
         renderedItems.push(
           <div
@@ -77,7 +77,11 @@ export default function ProjectWheel() {
               transform: `translate(${position.x}px, ${position.y}px) translateY(-50%) rotate(${-position.angle}deg)`,
             }}
           >
-            <span className="wheel-item__name">{PROJECTS[projectIndex]}</span>
+            <span
+              className={`wheel-item__name ${isSelected ? 'wheel-item__name--selected' : ''}`}
+            >
+              {PROJECTS[projectIndex]}
+            </span>
           </div>
         );
       } else {
@@ -96,7 +100,13 @@ export default function ProjectWheel() {
     }
 
     return renderedItems;
-  }, [rotation]);
+  }, [rotation, selectedIndex]);
 
-  return <div className="wheel-container">{items}</div>;
+  return (
+    <div className="wheel-container">
+      {/* Indicador de selección */}
+      <div className="wheel-selector" />
+      {items}
+    </div>
+  );
 }

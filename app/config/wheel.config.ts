@@ -58,6 +58,11 @@ export const INTERACTION_CONFIG = {
 
   // Umbral mínimo de velocidad para detener la inercia
   inertiaThreshold: 0.01,
+
+  // Snap (efecto pegajoso)
+  snapEnabled: true,
+  snapDuration: 400, // ms - duración de la animación de snap
+  snapThreshold: 0.5, // velocidad mínima para activar snap después de inercia
 };
 
 // Configuración de posicionamiento

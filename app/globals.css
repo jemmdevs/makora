@@ -36,6 +36,10 @@
   --wheel-item-gap: 12px;
   --wheel-project-font-size: 16px;
 
+  /* Rueda - Selector */
+  --wheel-selector-height: 40px;
+  --wheel-selector-color: rgba(255, 255, 255, 0.08);
+
   /* Transiciones */
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
@@ -132,6 +136,61 @@ body {
 }
 
 /* ==========================================================================
-   Legacy cleanup
+   Wheel Selector (Área de selección)
    ========================================================================== */
-/* ... eliminadas clases de MonthWheel para evitar conflictos ... */
+
+.wheel-selector {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: var(--wheel-selector-height);
+  background: var(--wheel-selector-color);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Líneas superior e inferior del selector */
+.wheel-selector::before,
+.wheel-selector::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0.15) 80%,
+    transparent
+  );
+}
+
+.wheel-selector::before {
+  top: 0;
+}
+
+.wheel-selector::after {
+  bottom: 0;
+}
+
+/* ==========================================================================
+   Estado seleccionado
+   ========================================================================== */
+
+.wheel-item__name--selected {
+  color: var(--color-text-primary);
+  opacity: 1;
+}
+
+/* Elementos no seleccionados más tenues */
+.wheel-item__name:not(.wheel-item__name--selected) {
+  opacity: 0.4;
+  transition: opacity var(--transition-normal);
+}
+
+.wheel-item__name--selected {
+  transition: opacity var(--transition-normal);
+}

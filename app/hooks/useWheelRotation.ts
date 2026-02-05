@@ -1,93 +1,150 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { INTERACTION_CONFIG } from "@/app/config/wheel.config";
-
-interface UseWheelRotationOptions {
-  wheelSensitivity?: number;
-  dragSensitivity?: number;
-  inertiaFriction?: number;
-  inertiaThreshold?: number;
-}
+import { INTERACTION_CONFIG, WHEEL_CONFIG } from "@/app/config/wheel.config";
 
 interface UseWheelRotationReturn {
   rotation: number;
+  selectedIndex: number;
   isDragging: boolean;
-  setRotation: (value: number | ((prev: number) => number)) => void;
 }
 
-export function useWheelRotation(
-  options: UseWheelRotationOptions = {}
-): UseWheelRotationReturn {
-  const {
-    wheelSensitivity = INTERACTION_CONFIG.wheelSensitivity,
-    dragSensitivity = INTERACTION_CONFIG.dragSensitivity,
-    inertiaFriction = INTERACTION_CONFIG.inertiaFriction,
-    inertiaThreshold = INTERACTION_CONFIG.inertiaThreshold,
-  } = options;
+// Ángulo que ocupa cada proyecto
+const ANGLE_PER_PROJECT = WHEEL_CONFIG.anglePerProject;
+const TOTAL_CYCLE = WHEEL_CONFIG.totalSlots * WHEEL_CONFIG.anglePerSlot;
 
+function normalizeRotation(rotation: number): number {
+  return ((rotation % TOTAL_CYCLE) + TOTAL_CYCLE) % TOTAL_CYCLE;
+}
+
+function getSelectedIndex(rotation: number): number {
+  const normalized = normalizeRotation(rotation);
+  const index = Math.round(normalized / ANGLE_PER_PROJECT) % WHEEL_CONFIG.totalProjects;
+  return index;
+}
+
+function getSnapTarget(rotation: number): number {
+  const normalized = normalizeRotation(rotation);
+  const nearestIndex = Math.round(normalized / ANGLE_PER_PROJECT);
+  return nearestIndex * ANGLE_PER_PROJECT;
+}
+
+export function useWheelRotation(): UseWheelRotationReturn {
   const [rotation, setRotation] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const rotationRef = useRef(0);
   const isDraggingRef = useRef(false);
   const lastY = useRef(0);
   const velocity = useRef(0);
   const animationFrame = useRef<number | null>(null);
+  const isSnapping = useRef(false);
 
-  const cancelInertia = useCallback(() => {
+  // Mantener rotationRef sincronizado
+  useEffect(() => {
+    rotationRef.current = rotation;
+    setSelectedIndex(getSelectedIndex(rotation));
+  }, [rotation]);
+
+  const cancelAnimation = useCallback(() => {
     if (animationFrame.current) {
       cancelAnimationFrame(animationFrame.current);
       animationFrame.current = null;
     }
   }, []);
 
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      const delta = e.deltaY * wheelSensitivity;
-      setRotation((prev) => prev + delta);
-    },
-    [wheelSensitivity]
-  );
+  const animateToTarget = useCallback((target: number, duration: number = 300) => {
+    cancelAnimation();
+    isSnapping.current = true;
 
-  const handlePointerDown = useCallback(
-    (e: PointerEvent) => {
+    const start = rotationRef.current;
+    const startTime = performance.now();
+
+    // Calcular diferencia más corta
+    let diff = target - normalizeRotation(start);
+    if (diff > TOTAL_CYCLE / 2) diff -= TOTAL_CYCLE;
+    if (diff < -TOTAL_CYCLE / 2) diff += TOTAL_CYCLE;
+
+    const animate = (time: number) => {
+      const elapsed = time - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      const newRotation = start + diff * eased;
+      setRotation(newRotation);
+
+      if (progress < 1) {
+        animationFrame.current = requestAnimationFrame(animate);
+      } else {
+        isSnapping.current = false;
+        animationFrame.current = null;
+      }
+    };
+
+    animationFrame.current = requestAnimationFrame(animate);
+  }, [cancelAnimation]);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (isSnapping.current || isDraggingRef.current) return;
+
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const currentSnap = getSnapTarget(rotationRef.current);
+      const newTarget = currentSnap + direction * ANGLE_PER_PROJECT;
+
+      animateToTarget(newTarget, 200);
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
       isDraggingRef.current = true;
       lastY.current = e.clientY;
       velocity.current = 0;
-      cancelInertia();
-    },
-    [cancelInertia]
-  );
+      cancelAnimation();
+      isSnapping.current = false;
+    };
 
-  const handlePointerMove = useCallback(
-    (e: PointerEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       if (!isDraggingRef.current) return;
 
       const deltaY = e.clientY - lastY.current;
       velocity.current = deltaY;
       lastY.current = e.clientY;
 
-      setRotation((prev) => prev - deltaY * dragSensitivity);
-    },
-    [dragSensitivity]
-  );
+      setRotation(prev => prev - deltaY * INTERACTION_CONFIG.dragSensitivity);
+    };
 
-  const handlePointerUp = useCallback(() => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
+    const handlePointerUp = () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
 
-    const applyInertia = () => {
-      if (Math.abs(velocity.current) > inertiaThreshold) {
-        setRotation((prev) => prev - velocity.current * dragSensitivity);
-        velocity.current *= inertiaFriction;
-        animationFrame.current = requestAnimationFrame(applyInertia);
+      const currentVelocity = velocity.current;
+
+      if (Math.abs(currentVelocity) > 3) {
+        // Inercia
+        const applyInertia = () => {
+          if (Math.abs(velocity.current) > 0.5) {
+            setRotation(prev => {
+              const newRot = prev - velocity.current * INTERACTION_CONFIG.dragSensitivity;
+              rotationRef.current = newRot;
+              return newRot;
+            });
+            velocity.current *= INTERACTION_CONFIG.inertiaFriction;
+            animationFrame.current = requestAnimationFrame(applyInertia);
+          } else {
+            // Snap al terminar inercia
+            const target = getSnapTarget(rotationRef.current);
+            animateToTarget(target, 300);
+          }
+        };
+        applyInertia();
       } else {
-        animationFrame.current = null;
+        // Snap directo
+        const target = getSnapTarget(rotationRef.current);
+        animateToTarget(target, 300);
       }
     };
 
-    applyInertia();
-  }, [dragSensitivity, inertiaFriction, inertiaThreshold]);
-
-  useEffect(() => {
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("pointerdown", handlePointerDown);
     window.addEventListener("pointermove", handlePointerMove);
@@ -100,19 +157,13 @@ export function useWheelRotation(
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointerleave", handlePointerUp);
-      cancelInertia();
+      cancelAnimation();
     };
-  }, [
-    handleWheel,
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp,
-    cancelInertia,
-  ]);
+  }, [animateToTarget, cancelAnimation]);
 
   return {
     rotation,
+    selectedIndex,
     isDragging: isDraggingRef.current,
-    setRotation,
   };
 }
