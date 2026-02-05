@@ -1,9 +1,9 @@
-import MonthWheel from "./components/MonthWheel";
+import ProjectWheel from "./components/ProjectWheel";
 
 export default function Home() {
   return (
     <div className="page-container">
-      <MonthWheel />
+      <ProjectWheel />
     </div>
   );
 }
