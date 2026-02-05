@@ -89,7 +89,7 @@ export function useWheelRotation(): UseWheelRotationReturn {
       e.preventDefault();
       if (isSnapping.current || isDraggingRef.current) return;
 
-      const direction = e.deltaY > 0 ? 1 : -1;
+      const direction = e.deltaY > 0 ? -1 : 1; // Invertido para que scroll down = rueda baja
       const currentSnap = getSnapTarget(rotationRef.current);
       const newTarget = currentSnap + direction * ANGLE_PER_PROJECT;
 
@@ -120,28 +120,28 @@ export function useWheelRotation(): UseWheelRotationReturn {
 
       const currentVelocity = velocity.current;
 
-      if (Math.abs(currentVelocity) > 3) {
-        // Inercia
+      if (Math.abs(currentVelocity) > 5) {
+        // Inercia corta
         const applyInertia = () => {
-          if (Math.abs(velocity.current) > 0.5) {
+          if (Math.abs(velocity.current) > 1) {
             setRotation(prev => {
               const newRot = prev - velocity.current * INTERACTION_CONFIG.dragSensitivity;
               rotationRef.current = newRot;
               return newRot;
             });
-            velocity.current *= INTERACTION_CONFIG.inertiaFriction;
+            velocity.current *= 0.9; // Fricción más alta para parar antes
             animationFrame.current = requestAnimationFrame(applyInertia);
           } else {
-            // Snap al terminar inercia
+            // Snap rápido al terminar inercia
             const target = getSnapTarget(rotationRef.current);
-            animateToTarget(target, 300);
+            animateToTarget(target, 150);
           }
         };
         applyInertia();
       } else {
-        // Snap directo
+        // Snap directo y rápido
         const target = getSnapTarget(rotationRef.current);
-        animateToTarget(target, 300);
+        animateToTarget(target, 150);
       }
     };
 
