@@ -381,3 +381,13 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
   color: white;
 }
+
+.chaos-btn--accent {
+  border-color: rgba(100, 200, 255, 0.35);
+  color: rgba(100, 200, 255, 0.8);
+}
+
+.chaos-btn--accent:hover {
+  border-color: rgba(100, 200, 255, 0.6);
+  color: rgba(100, 200, 255, 1);
+}

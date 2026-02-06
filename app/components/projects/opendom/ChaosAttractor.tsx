@@ -69,6 +69,10 @@ export default function ChaosAttractor() {
     rendererRef.current?.setAttractor(ATTRACTORS[attractorIndex], defaults);
   }, [attractorIndex]);
 
+  const handleLaunchTracers = useCallback(() => {
+    rendererRef.current?.launchTracers();
+  }, []);
+
   return (
     <>
       <div className="project-canvas">
@@ -123,6 +127,9 @@ export default function ChaosAttractor() {
           </div>
 
           <div className="chaos-actions">
+            <button className="chaos-btn chaos-btn--accent" onClick={handleLaunchTracers}>
+              Divergence
+            </button>
             <button className="chaos-btn" onClick={handlePerturb}>
               Perturb
             </button>

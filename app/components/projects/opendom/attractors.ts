@@ -33,7 +33,7 @@ export const ATTRACTORS: Attractor[] = [
     params: [
       { key: "sigma", symbol: "σ", min: 0, max: 50, step: 0.1, default: 10 },
       { key: "rho", symbol: "ρ", min: 0, max: 50, step: 0.1, default: 28 },
-      { key: "beta", symbol: "β", min: 0, max: 10, step: 0.01, default: 2.667 },
+      { key: "beta", symbol: "β", min: 0, max: 10, step: 0.01, default: 8 / 3 },
     ],
     solve: (x, y, z, p) => [
       p.sigma * (y - x),
