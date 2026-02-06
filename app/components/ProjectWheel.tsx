@@ -12,6 +12,7 @@ interface WheelItemPosition {
   y: number;
   angle: number;
   isVisible: boolean;
+  opacity: number;
 }
 
 // Ángulo total que ocupa un ciclo completo de la rueda
@@ -40,7 +41,7 @@ function calculateItemPosition(
     displayAngle <= WHEEL_CONFIG.maxVisibleAngle + WHEEL_CONFIG.visibilityMargin;
 
   if (!isVisible) {
-    return { x: 0, y: 0, angle: displayAngle, isVisible: false };
+    return { x: 0, y: 0, angle: displayAngle, isVisible: false, opacity: 0 };
   }
 
   const radians = (displayAngle * Math.PI) / 180;
@@ -48,7 +49,17 @@ function calculateItemPosition(
   const x = -(Math.cos(radians) * WHEEL_CONFIG.radius - cosMax * WHEEL_CONFIG.radius);
   const y = Math.sin(radians) * WHEEL_CONFIG.radius;
 
-  return { x, y, angle: displayAngle, isVisible: true };
+  // Opacidad progresiva: 1.0 en el centro, fade hacia los bordes (curva coseno)
+  const absAngle = Math.abs(displayAngle);
+  const fadeStart = WHEEL_CONFIG.maxVisibleAngle * 0.15;
+  const fadeEnd = WHEEL_CONFIG.maxVisibleAngle;
+  let opacity = 1;
+  if (absAngle > fadeStart) {
+    const t = (absAngle - fadeStart) / (fadeEnd - fadeStart);
+    opacity = Math.cos(Math.min(t, 1) * Math.PI * 0.5);
+  }
+
+  return { x, y, angle: displayAngle, isVisible: true, opacity };
 }
 
 interface ProjectWheelProps {
@@ -87,9 +98,11 @@ export default function ProjectWheel({ onProjectChange }: ProjectWheelProps) {
             className="wheel-base"
             style={{
               transform: `translate(${position.x}px, ${position.y}px) translateY(-50%) rotate(${-position.angle}deg)`,
+              opacity: position.opacity,
             }}
           >
             <span
+              key={isSelected ? `selected-${projectIndex}` : undefined}
               className={`wheel-item__name ${isSelected ? 'wheel-item__name--selected' : ''}`}
             >
               {PROJECTS[projectIndex]}
@@ -103,6 +116,7 @@ export default function ProjectWheel({ onProjectChange }: ProjectWheelProps) {
             className="wheel-base"
             style={{
               transform: `translate(${position.x}px, ${position.y}px) translateY(-50%) rotate(${-position.angle}deg)`,
+              opacity: position.opacity,
             }}
           >
             <span className="wheel-tick" />

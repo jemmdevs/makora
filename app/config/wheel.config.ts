@@ -19,30 +19,34 @@ const TOTAL_PROJECTS = PROJECTS.length;
 const TICKS_PER_PROJECT = 3;
 const SLOTS_PER_PROJECT = TICKS_PER_PROJECT + 1;
 const TOTAL_SLOTS = TOTAL_PROJECTS * SLOTS_PER_PROJECT;
+const COMPRESSION_FACTOR = 0.35;
 
 // Configuración de geometría de la rueda
 export const WHEEL_CONFIG = {
-  // Radio del círculo (menor = mayor curvatura)
   radius: 550,
-
-  // Ángulo máximo visible en grados (arco de visualización)
   maxVisibleAngle: 50,
-
-  // Margen extra para el culling de elementos
   visibilityMargin: 5,
-
-  // Número de ticks entre cada proyecto (menos = más junto)
   ticksPerProject: TICKS_PER_PROJECT,
-
-  // Factor de compresión (menor = elementos más juntos)
-  compressionFactor: 0.35,
+  compressionFactor: COMPRESSION_FACTOR,
 
   // Valores calculados
   totalProjects: TOTAL_PROJECTS,
-  anglePerProject: (360 / TOTAL_PROJECTS) * 0.35,
+  anglePerProject: (360 / TOTAL_PROJECTS) * COMPRESSION_FACTOR,
   slotsPerProject: SLOTS_PER_PROJECT,
   totalSlots: TOTAL_SLOTS,
-  anglePerSlot: (360 / TOTAL_SLOTS) * 0.35,
+  anglePerSlot: (360 / TOTAL_SLOTS) * COMPRESSION_FACTOR,
+};
+
+// Video asociado a cada proyecto (mismo orden que PROJECTS)
+export const PROJECT_VIDEOS: Record<ProjectName, string> = {
+  makora:  "/videoProject.webm",
+  ikra:    "/videoProject2.webm",
+  alawal:  "/videoProject.webm",
+  enuma:   "/videoProject2.webm",
+  aisac:   "/videoProject.webm",
+  mirilab: "/videoProject2.webm",
+  gdels:   "/videoProject.webm",
+  tousys:  "/videoProject2.webm",
 };
 
 // Configuración de interacción

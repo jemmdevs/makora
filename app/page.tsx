@@ -1,32 +1,21 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import ProjectWheel from "./components/ProjectWheel";
-
-const PROJECT_VIDEOS = [
-  "/videoProject.webm",   // makora
-  "/videoProject2.webm",  // ikra
-  "/videoProject.webm",   // alawal
-  "/videoProject2.webm",  // enuma
-  "/videoProject.webm",   // aisac
-  "/videoProject2.webm",  // mirilab
-  "/videoProject.webm",   // gdels
-  "/videoProject2.webm",  // tousys
-];
+import { PROJECTS, PROJECT_VIDEOS } from "./config/wheel.config";
 
 export default function Home() {
-  const [videoSrc, setVideoSrc] = useState(PROJECT_VIDEOS[0]);
+  const [videoSrc, setVideoSrc] = useState(PROJECT_VIDEOS[PROJECTS[0]]);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const currentSrcRef = useRef(videoSrc);
 
   const handleProjectChange = useCallback((index: number) => {
-    const newSrc = PROJECT_VIDEOS[index];
-    if (newSrc !== videoSrc) {
+    const newSrc = PROJECT_VIDEOS[PROJECTS[index]];
+    if (newSrc !== currentSrcRef.current) {
+      currentSrcRef.current = newSrc;
       setVideoSrc(newSrc);
-      if (videoRef.current) {
-        videoRef.current.load();
-      }
     }
-  }, [videoSrc]);
+  }, []);
 
   return (
     <div className="page-container">
@@ -34,11 +23,13 @@ export default function Home() {
         <video
           ref={videoRef}
           className="video-player"
+          key={videoSrc}
           src={videoSrc}
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
         />
       </div>
       <ProjectWheel onProjectChange={handleProjectChange} />
