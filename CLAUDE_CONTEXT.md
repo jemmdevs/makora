@@ -1,10 +1,20 @@
 # Makora - Contexto del Proyecto
 
 ## Descripción
-Portfolio personal con interfaz de rueda/jog dial estilo Apple. La página principal muestra una rueda interactiva con 8 proyectos que funciona como selector.
+Portfolio/laboratorio creativo con interfaz de rueda/jog dial estilo Apple. Página principal con rueda interactiva (derecha) + video del proyecto seleccionado (izquierda). Cada proyecto tiene página dedicada con layout 70/30.
 
 ## Proyectos en la rueda
 `makora`, `ikra`, `alawal`, `enuma`, `aisac`, `mirilab`, `gdels`, `tousys`
+
+### Concepto de cada proyecto (pendiente de implementar)
+1. **makora** — Botón con estilo único (componente)
+2. **ikra** — Notch estilo iOS (componente)
+3. **alawal** — Arte generativo matemático (Canvas/WebGL)
+4. **enuma** — Scroll animation de modelo 3D (Three.js)
+5. **aisac** — Hover animation
+6. **mirilab** — Componente estilo iOS
+7. **gdels** — Particle morphing text (Canvas/WebGL)
+8. **tousys** — Interactive fluid shader (WebGL/GLSL)
 
 ---
 
@@ -22,88 +32,67 @@ Portfolio personal con interfaz de rueda/jog dial estilo Apple. La página princ
 ```
 app/
 ├── config/
-│   └── wheel.config.ts      # Configuración centralizada (proyectos, geometría, interacción)
+│   └── wheel.config.ts          # Config centralizada (proyectos, geometría, interacción, videos)
 ├── hooks/
-│   └── useWheelRotation.ts  # Hook para rotación, drag, scroll y snap
+│   └── useWheelRotation.ts      # Hook para rotación, drag, scroll y snap
 ├── components/
-│   └── ProjectWheel.tsx     # Componente de la rueda
-├── globals.css              # Variables CSS y estilos
-├── layout.tsx               # Layout con fuente Inter
-└── page.tsx                 # Página principal
+│   └── ProjectWheel.tsx         # Componente de la rueda
+├── projects/
+│   └── [slug]/
+│       └── page.tsx             # Página de proyecto (layout 70/30)
+├── globals.css                  # Variables CSS y estilos
+├── layout.tsx                   # Layout con fuente Inter
+└── page.tsx                     # Página principal (video + rueda + footer)
+public/
+├── videoProject.webm            # Video placeholder 1
+├── videoProject2.webm           # Video placeholder 2
+└── jmakora.svg                  # Logo/marca personal
 ```
 
 ---
 
 ## Lo que está implementado
 
+### Página principal (page.tsx)
+- **Video** a la izquierda (26vw, max 380px) que cambia según proyecto seleccionado
+- **Rueda** a la derecha
+- **Footer** abajo-izquierda: logo jmakora.svg + links (portfolio, LinkedIn, Instagram)
+- Video usa `key={videoSrc}` para remount limpio al cambiar proyecto
+
 ### Rueda (ProjectWheel)
-- 8 proyectos + 3 ticks entre cada uno
-- Posicionamiento en arco usando trigonometría
-- Elementos visibles solo en el arco visible (optimización)
-- Rueda infinita (wrap around)
-- Compresión de ángulos (`compressionFactor: 0.5`) para elementos más juntos
+- 8 proyectos + 3 ticks entre cada uno, `compressionFactor: 0.35`
+- Radio: 550, posicionamiento en arco con trigonometría
+- Opacidad progresiva por ángulo (curva coseno) — elementos se desvanecen hacia bordes
+- Animación elastic-nudge al seleccionar (translate3d hacia derecha, 14px, GPU-accelerated)
+- Ticks: 48px largo, 1px grosor. Nombres: font-weight 300
+- `onProjectChange` callback para notificar cambio de selección al padre
 
 ### Interacción (useWheelRotation)
-- **Drag**: Movimiento libre mientras arrastras, snap al soltar
-- **Scroll**: Discreto - cada scroll mueve exactamente 1 elemento
-- **Snap**: Animación ease-out cúbica estilo Apple (150ms)
-- **Inercia**: Al soltar drag con velocidad, inercia corta y luego snap
+- **Drag**: Movimiento libre, snap al soltar
+- **Scroll**: Discreto — 1 proyecto por notch
+- **Snap**: Ease-out cúbica (150ms)
+- **Inercia**: Fricción 0.9, snap al parar
 
 ### Selector
-- Área visual en el centro (`.wheel-selector`)
-- Líneas superior e inferior con gradiente
-- Elemento seleccionado a opacidad 100%, resto al 40%
+- `.wheel-selector` existe en DOM pero es invisible (sin fondo, sin líneas)
 
-### Estilos
-- Variables CSS centralizadas en `:root`
-- Fuente Inter
-- Fondo negro, texto blanco
+### Página de proyecto (projects/[slug]/page.tsx)
+- Ruta dinámica, valida slug contra PROJECTS
+- Layout flex: 70% canvas (izq) | 1px divider | 30% info (der)
+- Canvas vacío listo para contenido interactivo
+- Info muestra título por ahora
 
----
-
-## Configuración actual (wheel.config.ts)
-
-```typescript
-WHEEL_CONFIG = {
-  radius: 650,
-  maxVisibleAngle: 50,
-  compressionFactor: 0.5,
-  ticksPerProject: 3,
-  // ... valores calculados automáticamente
-}
-
-INTERACTION_CONFIG = {
-  dragSensitivity: 0.15,
-  inertiaFriction: 0.96,
-  snapDuration: 400,
-  // ...
-}
-```
+### Config (wheel.config.ts)
+- `PROJECTS` array + `ProjectName` type
+- `WHEEL_CONFIG`: radius 550, compression 0.35, ángulos auto-calculados con COMPRESSION_FACTOR DRY
+- `INTERACTION_CONFIG`: drag, inercia, snap
+- `PROJECT_VIDEOS`: Record<ProjectName, string> — mapeo proyecto→video
 
 ---
 
-## Variables CSS importantes
-
-```css
---wheel-right-offset: 190px;    /* Posición horizontal de la rueda */
---wheel-tick-width: 32px;       /* Largo de los ticks */
---wheel-project-font-size: 16px;
---wheel-selector-height: 40px;
-```
-
----
-
-## Problema resuelto importante
-
-**Alineación de proyectos y ticks**: Los nombres de proyecto y los ticks deben EMPEZAR en el mismo punto (no terminar). Solución:
-- Ambos usan contenedor `.wheel-base` con mismo `right`
-- Hijos con `position: absolute; left: 0;` para que empiecen en el mismo punto
-
----
-
-## Notas de desarrollo
-
-- El scroll y drag funcionan correctamente después de varios ajustes
-- La dirección del scroll: scroll down = rueda baja (elementos suben visualmente)
-- El snap debe ser rápido (150ms) para sentirse responsive
-- La inercia usa fricción 0.9 para parar rápido antes del snap
+## Notas importantes
+- Alineación proyectos/ticks: ambos usan `.wheel-base` con `left: 0` para empezar en mismo punto
+- Scroll down = rueda baja
+- Videos: `videoProject.webm` y `videoProject2.webm` son placeholders, se alternan entre proyectos
+- Footer links: portfolio (josencv.vercel.app), LinkedIn, Instagram
+- CSS usa `!important` en `.bottom-bar` y `.brand-logo` por conflictos de especificidad

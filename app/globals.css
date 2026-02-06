@@ -102,6 +102,40 @@ body {
 }
 
 /* ==========================================================================
+   Social Links
+   ========================================================================== */
+
+.bottom-bar {
+  position: fixed;
+  bottom: 16px !important;
+  left: 32px !important;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  z-index: 10;
+}
+
+.brand-logo {
+  height: 64px !important;
+  width: auto !important;
+  flex-shrink: 0;
+}
+
+.social-links {
+  display: flex;
+  gap: 20px;
+}
+
+.social-links a {
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.2s ease;
+}
+
+.social-links a:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* ==========================================================================
    Wheel Component
    ========================================================================== */
 
@@ -185,4 +219,46 @@ body {
   50%  { transform: translateY(-50%) translate3d(-4px, 0, 0); }
   70%  { transform: translateY(-50%) translate3d(2px, 0, 0); }
   100% { transform: translateY(-50%) translate3d(0, 0, 0); }
+}
+
+/* ==========================================================================
+   Project Page
+   ========================================================================== */
+
+.project-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  background: var(--color-background);
+}
+
+.project-canvas {
+  flex: 0 0 70%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.project-info {
+  flex: 0 0 calc(30% - 1px);
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.project-info__title {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
 }
