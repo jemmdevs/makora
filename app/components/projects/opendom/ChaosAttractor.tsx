@@ -3,14 +3,12 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { ATTRACTORS, getDefaultParams } from "./attractors";
 import { ChaosRenderer } from "./ChaosRenderer";
-import BifurcationDiagram from "./BifurcationDiagram";
 
 export default function ChaosAttractor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<ChaosRenderer | null>(null);
   const [attractorIndex, setAttractorIndex] = useState(0);
   const [params, setParams] = useState(() => getDefaultParams(ATTRACTORS[0]));
-  const [showBifurcation, setShowBifurcation] = useState(false);
 
   const attractor = ATTRACTORS[attractorIndex];
 
@@ -75,29 +73,11 @@ export default function ChaosAttractor() {
     rendererRef.current?.launchTracers();
   }, []);
 
-  const handleToggleBifurcation = useCallback(() => {
-    setShowBifurcation((prev) => {
-      if (!prev) rendererRef.current?.stop();
-      else rendererRef.current?.start();
-      return !prev;
-    });
-  }, []);
 
   return (
     <>
       <div className="project-canvas">
-        <canvas
-          ref={canvasRef}
-          className="chaos-canvas"
-          style={{ display: showBifurcation ? "none" : "block" }}
-        />
-        {showBifurcation && (
-          <BifurcationDiagram
-            attractor={attractor}
-            currentParamValue={params[attractor.bifurcation.paramKey]}
-            onParamChange={handleParamChange}
-          />
-        )}
+        <canvas ref={canvasRef} className="chaos-canvas" />
       </div>
       <div className="project-divider" />
       <div className="project-info">
@@ -151,13 +131,7 @@ export default function ChaosAttractor() {
             <button className="chaos-btn chaos-btn--accent" onClick={handleLaunchTracers}>
               Divergence
             </button>
-            <button
-              className={`chaos-btn ${showBifurcation ? "chaos-btn--active" : ""}`}
-              onClick={handleToggleBifurcation}
-            >
-              Bifurcation
-            </button>
-            <button className="chaos-btn" onClick={handlePerturb}>
+<button className="chaos-btn" onClick={handlePerturb}>
               Perturb
             </button>
             <button className="chaos-btn" onClick={handleReset}>
