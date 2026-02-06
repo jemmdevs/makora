@@ -31,8 +31,8 @@
   --wheel-item-offset: 20px;
 
   /* Rueda - Elementos */
-  --wheel-tick-width: 32px;
-  --wheel-tick-height: 2px;
+  --wheel-tick-width: 48px;
+  --wheel-tick-height: 1px;
   --wheel-item-gap: 12px;
   --wheel-project-font-size: 16px;
 
@@ -80,6 +80,28 @@ body {
 }
 
 /* ==========================================================================
+   Video Container
+   ========================================================================== */
+
+.video-container {
+  position: fixed;
+  left: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20vw;
+  max-width: 280px;
+  z-index: 10;
+}
+
+.video-player {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+/* ==========================================================================
    Wheel Component
    ========================================================================== */
 
@@ -118,7 +140,7 @@ body {
   transform: translateY(-50%);
   color: var(--color-text-primary);
   font-size: var(--wheel-project-font-size);
-  font-weight: var(--font-weight-bold);
+  font-weight: 300;
   letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
   white-space: nowrap;
@@ -146,34 +168,7 @@ body {
   transform: translateY(-50%);
   width: 100%;
   height: var(--wheel-selector-height);
-  background: var(--wheel-selector-color);
-  border-radius: 8px;
   pointer-events: none;
-}
-
-/* Líneas superior e inferior del selector */
-.wheel-selector::before,
-.wheel-selector::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(255, 255, 255, 0.15) 20%,
-    rgba(255, 255, 255, 0.15) 80%,
-    transparent
-  );
-}
-
-.wheel-selector::before {
-  top: 0;
-}
-
-.wheel-selector::after {
-  bottom: 0;
 }
 
 /* ==========================================================================

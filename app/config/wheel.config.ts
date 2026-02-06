@@ -23,7 +23,7 @@ const TOTAL_SLOTS = TOTAL_PROJECTS * SLOTS_PER_PROJECT;
 // Configuración de geometría de la rueda
 export const WHEEL_CONFIG = {
   // Radio del círculo (menor = mayor curvatura)
-  radius: 650,
+  radius: 550,
 
   // Ángulo máximo visible en grados (arco de visualización)
   maxVisibleAngle: 50,
@@ -35,14 +35,14 @@ export const WHEEL_CONFIG = {
   ticksPerProject: TICKS_PER_PROJECT,
 
   // Factor de compresión (menor = elementos más juntos)
-  compressionFactor: 0.5,
+  compressionFactor: 0.35,
 
   // Valores calculados
   totalProjects: TOTAL_PROJECTS,
-  anglePerProject: (360 / TOTAL_PROJECTS) * 0.5,
+  anglePerProject: (360 / TOTAL_PROJECTS) * 0.35,
   slotsPerProject: SLOTS_PER_PROJECT,
   totalSlots: TOTAL_SLOTS,
-  anglePerSlot: (360 / TOTAL_SLOTS) * 0.5,
+  anglePerSlot: (360 / TOTAL_SLOTS) * 0.35,
 };
 
 // Configuración de interacción

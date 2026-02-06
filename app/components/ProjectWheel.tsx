@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { useWheelRotation } from "@/app/hooks/useWheelRotation";
 import {
   PROJECTS,
@@ -51,8 +51,20 @@ function calculateItemPosition(
   return { x, y, angle: displayAngle, isVisible: true };
 }
 
-export default function ProjectWheel() {
+interface ProjectWheelProps {
+  onProjectChange?: (index: number) => void;
+}
+
+export default function ProjectWheel({ onProjectChange }: ProjectWheelProps) {
   const { rotation, selectedIndex } = useWheelRotation();
+
+  const prevIndexRef = React.useRef(selectedIndex);
+  React.useEffect(() => {
+    if (prevIndexRef.current !== selectedIndex) {
+      prevIndexRef.current = selectedIndex;
+      onProjectChange?.(selectedIndex);
+    }
+  }, [selectedIndex, onProjectChange]);
 
   const items = useMemo(() => {
     const renderedItems: ReactNode[] = [];
