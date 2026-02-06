@@ -23,6 +23,11 @@ export interface Attractor {
   scale: number;
   center: [number, number, number];
   dt: number;
+  bifurcation: {
+    paramKey: string;
+    range: [number, number];
+    component: 0 | 1 | 2;
+  };
 }
 
 export const ATTRACTORS: Attractor[] = [
@@ -43,6 +48,7 @@ export const ATTRACTORS: Attractor[] = [
     scale: 8,
     center: [0, 0, 25],
     dt: 0.005,
+    bifurcation: { paramKey: "rho", range: [0, 200], component: 2 },
   },
   {
     id: "aizawa",
@@ -72,6 +78,7 @@ export const ATTRACTORS: Attractor[] = [
     scale: 150,
     center: [0, 0, 0],
     dt: 0.005,
+    bifurcation: { paramKey: "a", range: [0.4, 1.5], component: 2 },
   },
   {
     id: "thomas",
@@ -92,6 +99,7 @@ export const ATTRACTORS: Attractor[] = [
     scale: 80,
     center: [0, 0, 0],
     dt: 0.05,
+    bifurcation: { paramKey: "b", range: [0.05, 0.35], component: 0 },
   },
 ];
 

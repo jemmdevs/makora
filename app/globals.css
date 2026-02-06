@@ -258,6 +258,10 @@ body {
   display: block;
 }
 
+.chaos-canvas--interactive {
+  cursor: crosshair;
+}
+
 .chaos-controls {
   display: flex;
   flex-direction: column;
@@ -390,4 +394,9 @@ body {
 .chaos-btn--accent:hover {
   border-color: rgba(100, 200, 255, 0.6);
   color: rgba(100, 200, 255, 1);
+}
+
+.chaos-btn--active {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
 }
