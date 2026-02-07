@@ -1,98 +1,88 @@
 # Makora - Contexto del Proyecto
 
 ## Descripción
-Portfolio/laboratorio creativo con interfaz de rueda/jog dial estilo Apple. Página principal con rueda interactiva (derecha) + video del proyecto seleccionado (izquierda). Cada proyecto tiene página dedicada con layout 70/30.
+Portfolio/laboratorio creativo con interfaz de rueda/jog dial estilo Apple. Página principal con rueda interactiva (derecha) + video del proyecto seleccionado (izquierda). Cada proyecto tiene página dedicada con layout 70/30 (canvas | divider 1px | info panel).
 
-## Proyectos en la rueda
-`makora`, `ikra`, `alawal`, `enuma`, `aisac`, `mirilab`, `gdels`, `tousys`
+## Stack
+Next.js 16.1.6 (App Router) · React 19.2.3 · Tailwind CSS 4 · Inter · JS puro con `requestAnimationFrame`
 
-### Concepto de cada proyecto (pendiente de implementar)
-1. **makora** — Botón con estilo único (componente)
-2. **ikra** — Notch estilo iOS (componente)
-3. **alawal** — Arte generativo matemático (Canvas/WebGL)
-4. **enuma** — Scroll animation de modelo 3D (Three.js)
-5. **aisac** — Hover animation
-6. **mirilab** — Componente estilo iOS
-7. **gdels** — Particle morphing text (Canvas/WebGL)
-8. **tousys** — Interactive fluid shader (WebGL/GLSL)
+## Proyectos
+`makora`, `ikra`, `opendom`, `enuma`, `aisac`, `mirilab`, `gdels`, `ciel`
 
----
-
-## Stack Técnico
-- **Framework**: Next.js 16.1.6 (App Router)
-- **React**: 19.2.3
-- **Estilos**: Tailwind CSS 4 + CSS Variables
-- **Fuente**: Inter (estilo Apple)
-- **Animaciones**: JavaScript puro con `requestAnimationFrame` (no Framer Motion)
+| Proyecto | Estado | Concepto |
+|----------|--------|----------|
+| makora | pendiente | Botón con estilo único |
+| ikra | pendiente | Notch estilo iOS |
+| opendom | ✅ | Atractores extraños (Lorenz, Aizawa, Thomas) — Canvas 2D |
+| enuma | pendiente | Scroll animation 3D (Three.js) |
+| aisac | pendiente | Hover animation |
+| mirilab | pendiente | Componente estilo iOS |
+| gdels | pendiente | Particle morphing text |
+| ciel | ✅ | Gravity + Wormhole + Dimensions — Canvas 2D |
 
 ---
 
-## Estructura de Archivos
+## Estructura
 
 ```
 app/
-├── config/
-│   └── wheel.config.ts          # Config centralizada (proyectos, geometría, interacción, videos)
-├── hooks/
-│   └── useWheelRotation.ts      # Hook para rotación, drag, scroll y snap
+├── config/wheel.config.ts       # PROJECTS, WHEEL_CONFIG, INTERACTION_CONFIG, PROJECT_VIDEOS
+├── hooks/useWheelRotation.ts    # Drag, scroll, snap, inercia
 ├── components/
-│   └── ProjectWheel.tsx         # Componente de la rueda
-├── projects/
-│   └── [slug]/
-│       └── page.tsx             # Página de proyecto (layout 70/30)
-├── globals.css                  # Variables CSS y estilos
-├── layout.tsx                   # Layout con fuente Inter
-└── page.tsx                     # Página principal (video + rueda + footer)
+│   ├── ProjectWheel.tsx         # Rueda (arco trigonométrico, opacidad coseno, elastic-nudge)
+│   └── projects/
+│       ├── opendom/             # ChaosAttractor.tsx, ChaosRenderer.ts, attractors.ts
+│       └── ciel/                # CielProject.tsx, simulations.ts, GravityRenderer.ts,
+│                                # WormholeRenderer.ts, DimensionRenderer.ts
+├── projects/[slug]/page.tsx     # Routing dinámico → PROJECT_COMPONENTS map
+├── globals.css                  # CSS variables, rueda, controles (chaos-*), proyecto
+├── layout.tsx · page.tsx
 public/
-├── videoProject.webm            # Video placeholder 1
-├── videoProject2.webm           # Video placeholder 2
-└── jmakora.svg                  # Logo/marca personal
+├── videoProject.webm · videoProject2.webm (placeholders, se alternan)
+└── jmakora.svg
 ```
 
 ---
 
-## Lo que está implementado
+## Implementación clave
 
-### Página principal (page.tsx)
-- **Video** a la izquierda (26vw, max 380px) que cambia según proyecto seleccionado
-- **Rueda** a la derecha
-- **Footer** abajo-izquierda: logo jmakora.svg + links (portfolio, LinkedIn, Instagram)
-- Video usa `key={videoSrc}` para remount limpio al cambiar proyecto
+### Rueda (home)
+- 8 proyectos + 3 ticks entre cada uno, radio 550, compression 0.35
+- Scroll discreto (1 proyecto/notch), drag con inercia (fricción 0.9), snap ease-out 150ms
+- Video izquierda cambia con `key={videoSrc}` al seleccionar proyecto
+- Footer: logo jmakora.svg + links (portfolio, LinkedIn, Instagram)
 
-### Rueda (ProjectWheel)
-- 8 proyectos + 3 ticks entre cada uno, `compressionFactor: 0.35`
-- Radio: 550, posicionamiento en arco con trigonometría
-- Opacidad progresiva por ángulo (curva coseno) — elementos se desvanecen hacia bordes
-- Animación elastic-nudge al seleccionar (translate3d hacia derecha, 14px, GPU-accelerated)
-- Ticks: 48px largo, 1px grosor. Nombres: font-weight 300
-- `onProjectChange` callback para notificar cambio de selección al padre
+### OpenDom — Chaos Theory
+- `ChaosRenderer.ts`: 2500 partículas, integración RK4, proyección 3D con rotación, trail fade overlay
+- `attractors.ts`: Lorenz, Aizawa, Thomas (solve + params configurables)
+- Trazadores de divergencia (sensibilidad a condiciones iniciales)
+- Acciones: Divergence, Perturb, Reset
 
-### Interacción (useWheelRotation)
-- **Drag**: Movimiento libre, snap al soltar
-- **Scroll**: Discreto — 1 proyecto por notch
-- **Snap**: Ease-out cúbica (150ms)
-- **Inercia**: Fricción 0.9, snap al parar
+### Ciel — Simulaciones físicas/matemáticas
+Arquitectura extensible: interfaz `SimulationRenderer` (start/stop/destroy/resize/updateParams/action), factory de renderers en `CielProject.tsx`, definiciones en `simulations.ts`.
 
-### Selector
-- `.wheel-selector` existe en DOM pero es invisible (sin fondo, sin líneas)
+**Gravity** (N-Body Problem)
+- 3 cuerpos iniciales (max 12) + 600 polvo, Velocity Verlet + Euler
+- F = G·m₁·m₂/(r²+ε²), softening, glow radial, trail fade
+- Cámara auto-zoom: sigue COM, escala para mantener todos los cuerpos visibles
+- Acciones: Add Body, Perturb, Reset
 
-### Página de proyecto (projects/[slug]/page.tsx)
-- Ruta dinámica, valida slug contra PROJECTS
-- Layout flex: 70% canvas (izq) | 1px divider | 30% info (der)
-- Canvas vacío listo para contenido interactivo
-- Info muestra título por ahora
+**Wormhole** (Gravitational Lensing)
+- 2000 estrellas, lente delgada: θ±=(β±√(β²+4θ²_E))/2
+- Imagen primaria + secundaria, Einstein ring, photon ring glow, sombra central
+- Lente sigue cursor (lerp) + órbita Lissajous en idle
+- Clear-and-redraw cada frame
 
-### Config (wheel.config.ts)
-- `PROJECTS` array + `ProjectName` type
-- `WHEEL_CONFIG`: radius 550, compression 0.35, ángulos auto-calculados con COMPRESSION_FACTOR DRY
-- `INTERACTION_CONFIG`: drag, inercia, snap
-- `PROJECT_VIDEOS`: Record<ProjectName, string> — mapeo proyecto→video
+**Dimensions** (4D Geometry)
+- Tesseract: 16 vértices, 32 aristas, rotación XW + YZ + XZ lenta acoplada
+- Doble proyección perspectiva 4D→3D→2D, trail fade
+- Vértices glow azul-blanco, aristas opacidad por profundidad
 
 ---
 
-## Notas importantes
-- Alineación proyectos/ticks: ambos usan `.wheel-base` con `left: 0` para empezar en mismo punto
-- Scroll down = rueda baja
-- Videos: `videoProject.webm` y `videoProject2.webm` son placeholders, se alternan entre proyectos
-- Footer links: portfolio (josencv.vercel.app), LinkedIn, Instagram
-- CSS usa `!important` en `.bottom-bar` y `.brand-logo` por conflictos de especificidad
+## Notas
+- CSS controles (`chaos-*`) reutilizados por OpenDom y Ciel
+- Slider: `padding: 8px 0` para hit area amplia manteniendo visual 1px
+- Reset en Ciel: resetea params a defaults antes de reiniciar renderer
+- Videos placeholder se alternan entre proyectos
+- CSS usa `!important` en `.bottom-bar` y `.brand-logo` por especificidad

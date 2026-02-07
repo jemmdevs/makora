@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { PROJECTS } from "@/app/config/wheel.config";
 import ChaosAttractor from "@/app/components/projects/opendom/ChaosAttractor";
+import CielProject from "@/app/components/projects/ciel/CielProject";
 import type { ComponentType } from "react";
 
 interface ProjectPageProps {
@@ -10,6 +11,7 @@ interface ProjectPageProps {
 // Mapeo de slug → componente de proyecto
 const PROJECT_COMPONENTS: Partial<Record<string, ComponentType>> = {
   opendom: ChaosAttractor,
+  ciel: CielProject,
 };
 
 export default async function ProjectPage({ params }: ProjectPageProps) {

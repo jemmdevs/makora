@@ -9,7 +9,7 @@ export const PROJECTS = [
   "aisac",
   "mirilab",
   "gdels",
-  "tousys",
+  "ciel",
 ] as const;
 
 export type ProjectName = (typeof PROJECTS)[number];
@@ -35,14 +35,14 @@ export const WHEEL_CONFIG = {
 
 // Video asociado a cada proyecto (mismo orden que PROJECTS)
 export const PROJECT_VIDEOS: Record<ProjectName, string> = {
-  makora:  "/videoProject.webm",
-  ikra:    "/videoProject2.webm",
-  opendom:  "/videoProject.webm",
-  enuma:   "/videoProject2.webm",
-  aisac:   "/videoProject.webm",
+  makora: "/videoProject.webm",
+  ikra: "/videoProject2.webm",
+  opendom: "/videoProject.webm",
+  enuma: "/videoProject2.webm",
+  aisac: "/videoProject.webm",
   mirilab: "/videoProject2.webm",
-  gdels:   "/videoProject.webm",
-  tousys:  "/videoProject2.webm",
+  gdels: "/videoProject.webm",
+  ciel: "/videoProject2.webm",
 };
 
 // Configuración de interacción

@@ -332,6 +332,10 @@ body {
   background: rgba(255, 255, 255, 0.15);
   outline: none;
   border-radius: 0;
+  cursor: pointer;
+  padding: 8px 0;
+  margin: -8px 0;
+  background-clip: content-box;
 }
 
 .chaos-param__slider::-webkit-slider-thumb {
